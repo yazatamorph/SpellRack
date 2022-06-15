@@ -1,27 +1,59 @@
 import React from 'react';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import ProTip from '../src/ProTip';
-import Link from '../src/Link';
-import Copyright from '../src/Copyright';
+import { Grid, TextField, Typography } from '@mui/material';
 
 import DefaultLayout from '../layouts/DefaultLayout';
 
 export default function Index() {
 	return (
-		<Container maxWidth='lg'>
-			<Box sx={{ my: 4 }}>
-				<Typography variant='h4' component='h1' gutterBottom>
-					Next.js example
-				</Typography>
-				<Link href='/about' color='secondary'>
-					Go to the about page
-				</Link>
-				<ProTip />
-				<Copyright />
-			</Box>
-		</Container>
+		<React.Fragment>
+			<Grid container alignItems='center' rowSpacing={{ xs: 4, md: 1 }}>
+				<Grid
+					container
+					item
+					xs={12}
+					justifyContent='center'
+					alignContent='center'
+				>
+					<Grid item xs={12} sm={10}>
+						<Typography
+							variant='h3'
+							component='h1'
+							align='center'
+							mt={{ md: 10 }}
+							mb={{ md: -2 }}
+						>
+							Select a scroll, Planeswalker.
+						</Typography>
+						<br />
+						<Typography
+							variant='h5'
+							component='h2'
+							align='center'
+							mb={{ md: 10 }}
+						>
+							<strong>SpellRack</strong> is a deck builder for{' '}
+							<strong>Magic: The Gathering</strong>.
+						</Typography>
+					</Grid>
+				</Grid>
+				<Grid
+					container
+					item
+					xs={12}
+					justifyContent='center'
+					alignContent='center'
+				>
+					<Grid item xs={12} sm={8} md={6}>
+						<TextField
+							fullWidth
+							placeholder='Search the racks...'
+							variant='outlined'
+							inputProps={{ 'aria-label': 'search' }}
+						></TextField>
+					</Grid>
+				</Grid>
+			</Grid>
+		</React.Fragment>
 	);
 }
 

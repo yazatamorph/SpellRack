@@ -3,8 +3,8 @@ import { styled, alpha } from '@mui/material/styles';
 import {
 	AppBar,
 	Box,
+	Button,
 	IconButton,
-	InputBase,
 	Menu,
 	MenuItem,
 	Toolbar,
@@ -16,50 +16,11 @@ import {
 	Search as SearchIcon,
 } from '@mui/icons-material';
 
-const Search = styled('div')(({ theme }) => ({
-	position: 'relative',
-	borderRadius: theme.shape.borderRadius,
-	backgroundColor: alpha(theme.palette.common.white, 0.15),
-	'&:hover': {
-		backgroundColor: alpha(theme.palette.common.white, 0.25),
-	},
-	marginRight: theme.spacing(2),
-	marginLeft: 0,
-	width: '100%',
-	[theme.breakpoints.up('sm')]: {
-		marginLeft: theme.spacing(3),
-		width: 'auto',
-	},
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-	padding: theme.spacing(0, 2),
-	height: '100%',
-	position: 'absolute',
-	pointerEvents: 'none',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-	color: 'inherit',
-	'& .MuiInputBase-input': {
-		padding: theme.spacing(1, 1, 1, 0),
-		// vertical padding + font size from searchIcon
-		paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-		transition: theme.transitions.create('width'),
-		width: '100%',
-		[theme.breakpoints.up('md')]: {
-			width: '20ch',
-		},
-	},
-}));
-
 export default function NavBar() {
 	const [anchorEl, setAnchorEl] = useState(null);
-
 	const isMenuOpen = Boolean(anchorEl);
+	// TODO: needs to be set based on existence of token or w/e
+	const [isLoggedIn, setIsLoggedIn] = useState(true);
 
 	const handleProfileMenuOpen = (event) => {
 		setAnchorEl(event.currentTarget);
@@ -112,28 +73,26 @@ export default function NavBar() {
 					>
 						ScrollRack
 					</Typography>
-					<Search>
-						<SearchIconWrapper>
-							<SearchIcon />
-						</SearchIconWrapper>
-						<StyledInputBase
-							placeholder='Search…'
-							inputProps={{ 'aria-label': 'search' }}
-						/>
-					</Search>
 					<Box sx={{ flexGrow: 1 }} />
 					<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-						<IconButton
-							size='large'
-							edge='end'
-							aria-label='account of current user'
-							aria-controls={menuId}
-							aria-haspopup='true'
-							onClick={handleProfileMenuOpen}
-							color='inherit'
-						>
-							<AccountCircle />
-						</IconButton>
+						{isLoggedIn ? (
+							<IconButton
+								size='large'
+								edge='end'
+								aria-label='account of current user'
+								aria-controls={menuId}
+								aria-haspopup='true'
+								onClick={handleProfileMenuOpen}
+								color='inherit'
+							>
+								<AccountCircle />
+							</IconButton>
+						) : (
+							/* TODO: fix button color */
+							<Button color='error' variant='contained' disableElevation>
+								Login
+							</Button>
+						)}
 					</Box>
 				</Toolbar>
 			</AppBar>

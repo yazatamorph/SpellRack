@@ -1,21 +1,27 @@
 import React from 'react';
-import { Box, Container } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 
+import Footer from '../components/Footer';
 import Link from '../components/Link';
 import NavBar from '../components/NavBar';
 
 export default function DefaultLayout({ children }) {
 	return (
-		<div>
+		<Box
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				minHeight: '100vh',
+			}}
+		>
 			<NavBar />
-			<Container maxWidth='lg'>
-				<Box mt={2}>
-					{children}
-					<Link href='/about' color='secondary'>
-						Go to the about page
-					</Link>
-				</Box>
+			<Container component='main' maxWidth='lg' mt={{ xs: 2, md: 0 }}>
+				{children}
+				<Link href='/about' color='secondary'>
+					Go to the about page
+				</Link>
 			</Container>
-		</div>
+			<Footer />
+		</Box>
 	);
 }

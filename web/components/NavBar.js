@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { styled, alpha } from '@mui/material/styles';
 import {
 	AppBar,
 	Box,
@@ -10,11 +9,7 @@ import {
 	Toolbar,
 	Typography,
 } from '@mui/material';
-import {
-	AccountCircle,
-	Menu as MenuIcon,
-	Search as SearchIcon,
-} from '@mui/icons-material';
+import { AccountCircle, Menu as MenuIcon } from '@mui/icons-material';
 
 export default function NavBar() {
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -55,7 +50,7 @@ export default function NavBar() {
 	return (
 		<>
 			<AppBar position='fixed'>
-				<Toolbar>
+				<Toolbar variant='dense'>
 					<IconButton
 						size='large'
 						edge='start'

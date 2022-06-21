@@ -3,13 +3,15 @@ import {
 	Avatar,
 	Box,
 	Button,
+	Container,
 	Grid,
+	Paper,
 	TextField,
 	Typography,
 } from '@mui/material';
 import { LockOutlined } from '@mui/icons-material';
 
-import Layout from '../layouts/HomeLayout';
+import Layout from '../layouts/AuthLayout';
 import Link from '../components/Link';
 
 export default function SignIn() {
@@ -23,9 +25,11 @@ export default function SignIn() {
 	};
 
 	return (
-		<Box component='main' maxWidth='xs'>
+		<Container component='main' maxWidth='sm'>
 			<Box
+				component={Paper}
 				sx={{
+					p: 4,
 					marginTop: 8,
 					display: 'flex',
 					flexDirection: 'column',
@@ -81,7 +85,7 @@ export default function SignIn() {
 					</Grid>
 				</Box>
 			</Box>
-		</Box>
+		</Container>
 	);
 }
 

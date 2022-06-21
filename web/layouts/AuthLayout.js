@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 
 import Footer from '../components/Footer';
 import NavBar from '../components/NavBar';
 
-export default function HomeLayout({ children }) {
+export default function AuthLayout({ children }) {
 	return (
 		<Box
 			sx={{
@@ -14,9 +14,7 @@ export default function HomeLayout({ children }) {
 			}}
 		>
 			<NavBar />
-			<Container component='main' maxWidth='lg' mt={{ xs: 2, md: 0 }}>
-				{children}
-			</Container>
+			{children}
 			<Footer />
 		</Box>
 	);

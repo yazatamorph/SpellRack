@@ -2,9 +2,10 @@ import React from 'react';
 import { Box, Container } from '@mui/material';
 
 import Footer from '../components/Footer';
+import Link from '../components/Link';
 import NavBar from '../components/NavBar';
 
-export default function DefaultLayout({ children }) {
+export default function HomeLayout({ children }) {
 	return (
 		<Box
 			sx={{
@@ -14,8 +15,11 @@ export default function DefaultLayout({ children }) {
 			}}
 		>
 			<NavBar />
-			<Container component='main' maxWidth='xl' mt={{ xs: 2, md: 0 }}>
+			<Container component='main' maxWidth='lg' mt={{ xs: 2, md: 0 }}>
 				{children}
+				<Link href='/about' color='secondary'>
+					Go to the about page
+				</Link>
 			</Container>
 			<Footer />
 		</Box>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, TextField, Typography } from '@mui/material';
 
-import DefaultLayout from '../layouts/DefaultLayout';
+import Layout from '../layouts/HomeLayout';
 
 export default function Index() {
 	return (
@@ -58,5 +58,5 @@ export default function Index() {
 }
 
 Index.getLayout = function getLayout(page) {
-	return <DefaultLayout>{page}</DefaultLayout>;
+	return <Layout>{page}</Layout>;
 };

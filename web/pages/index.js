@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, TextField, Typography } from '@mui/material';
 
 import Layout from '../layouts/HomeLayout';
+import SearchDialogue from '../components/SearchDialogue';
 
 export default function Index() {
 	return (

@@ -33,7 +33,7 @@ export default function SearchDialogue() {
 	return (
 		<React.Fragment>
 			<Button variant='outlined' onClick={handleClickOpen}>
-				Open full-screen dialog
+				Find Cards
 			</Button>
 			<Dialog
 				fullScreen

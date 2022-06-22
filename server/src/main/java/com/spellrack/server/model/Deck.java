@@ -20,7 +20,7 @@ public class Deck {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
-    private Integer id;
+    private Long id;
     @ManyToOne(optional = false)
     @JoinColumn(name = "USER_ID", nullable = false, updatable = false)
     private User user;

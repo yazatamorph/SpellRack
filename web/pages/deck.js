@@ -4,6 +4,7 @@ import { Box, Grid, Stack, Typography } from '@mui/material';
 import Layout from '../layouts/DefaultLayout';
 import DeckList from '../components/DeckList';
 import FeatureCard from '../components/FeatureCard';
+import SearchDialogue from '../components/SearchDialogue';
 
 export default function Deck() {
 	return (
@@ -16,7 +17,11 @@ export default function Deck() {
 					by Some Nerd
 				</Typography>
 			</Box>
-			<Grid container xs={4} sm={8} md={12} justifyContent='flex-start'>
+			<Grid
+				container
+				columns={{ xs: 4, sm: 8, md: 12 }}
+				justifyContent='flex-start'
+			>
 				<Stack
 					columnGap={0.5}
 					rowGap={0.5}
@@ -34,6 +39,7 @@ export default function Deck() {
 				</Stack>
 			</Grid>
 			<Box sx={{ my: 2 }}></Box>
+			<SearchDialogue />
 		</React.Fragment>
 	);
 }

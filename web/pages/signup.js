@@ -1,28 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import {
 	Avatar,
 	Box,
 	Button,
+	FormControl,
+	FormHelperText,
 	Grid,
 	Paper,
 	TextField,
 	Typography,
 } from '@mui/material';
 import { LockOutlined } from '@mui/icons-material';
+import { connect } from 'react-redux';
 
 import Layout from '../layouts/AuthLayout';
 import Link from '../components/Link';
+import { register } from '../store/utils/thunkCreators';
+function SignUp(props) {
+	const { user, register } = props;
+	const router = useRouter();
+	const [formErrorMessage, setFormErrorMessage] = useState({});
 
-export default function SignUp() {
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		console.log({
-			userName: data.get('userName'),
+
+		if (password !== confirmPassword) {
+			setFormErrorMessage({ confirmPassword: 'Passwords must match' });
+			return;
+		}
+
+		await register({
+			username: data.get('username'),
 			email: data.get('email'),
 			password: data.get('password'),
 		});
 	};
+
+	if (user.id) router.push('/deck');
 
 	return (
 		<Grid container component='main' sx={{ display: 'flex', flexGrow: 1 }}>
@@ -77,11 +93,11 @@ export default function SignUp() {
 						<Grid container spacing={2}>
 							<Grid item xs={12}>
 								<TextField
-									name='userName'
+									name='username'
 									required
 									fullWidth
-									id='userName'
-									label='User Name'
+									id='username'
+									label='Username'
 									autoFocus
 								/>
 							</Grid>
@@ -96,17 +112,38 @@ export default function SignUp() {
 								/>
 							</Grid>
 							<Grid item xs={12}>
-								<TextField
-									required
-									fullWidth
-									name='password'
-									label='Password'
-									type='password'
-									id='password'
-									autoComplete='new-password'
-								/>
+								<FormControl error={!!formErrorMessage.confirmPassword}>
+									<TextField
+										required
+										fullWidth
+										name='password'
+										label='Password'
+										type='password'
+										id='password'
+										autoComplete='new-password'
+									/>
+									<FormHelperText>
+										{formErrorMessage.confirmPassword}
+									</FormHelperText>
+								</FormControl>
 							</Grid>
-							<Grid item xs={12}></Grid>
+							<Grid item xs={12}>
+								<FormControl error={!!formErrorMessage.confirmPassword}>
+									<TextField
+										required
+										fullWidth
+										name='confirmPassword'
+										label='Confirm Password'
+										type='password'
+										id='confirmPassword'
+										autoComplete='new-password'
+									/>
+									<FormHelperText>
+										{formErrorMessage.confirmPassword}
+									</FormHelperText>
+								</FormControl>
+							</Grid>
+							{/* <Grid item xs={12}></Grid> */}
 						</Grid>
 						<Button
 							type='submit'
@@ -133,3 +170,19 @@ export default function SignUp() {
 SignUp.getLayout = function getLayout(page) {
 	return <Layout>{page}</Layout>;
 };
+
+const mapStateToProps = (state) => {
+	return {
+		user: state.user,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		register: (credentials) => {
+			dispatch(register(credentials));
+		},
+	};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

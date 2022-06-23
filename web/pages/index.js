@@ -1,10 +1,11 @@
 import React from 'react';
 import { Grid, TextField, Typography } from '@mui/material';
+import { connect } from 'react-redux';
 
 import Layout from '../layouts/HomeLayout';
-import SearchDialogue from '../components/SearchDialogue';
-
-export default function Index() {
+// TODO: not the right import for this page
+import { login } from '../store/utils/thunkCreators';
+function Index() {
 	return (
 		<React.Fragment>
 			<Grid container alignItems='center' rowSpacing={{ xs: 4, md: 1 }}>
@@ -61,3 +62,19 @@ export default function Index() {
 Index.getLayout = function getLayout(page) {
 	return <Layout>{page}</Layout>;
 };
+// TODO: these aren't the right ones for this page lul
+const mapStateToProps = (state) => {
+	return {
+		user: state.user,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		login: (credentials) => {
+			dispatch(login(credentials));
+		},
+	};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Index);

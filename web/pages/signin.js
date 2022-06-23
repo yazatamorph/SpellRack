@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import {
 	Avatar,
 	Box,
@@ -10,19 +11,26 @@ import {
 	Typography,
 } from '@mui/material';
 import { LockOutlined } from '@mui/icons-material';
+import { connect } from 'react-redux';
 
 import Layout from '../layouts/AuthLayout';
 import Link from '../components/Link';
+import { login } from '../store/utils/thunkCreators';
 
-export default function SignIn() {
-	const handleSubmit = (event) => {
+function SignIn(props) {
+	const { user, login } = props;
+	const router = useRouter();
+
+	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		console.log({
-			email: data.get('email'),
+		await login({
+			username: data.get('username'),
 			password: data.get('password'),
 		});
 	};
+
+	if (user.id) router.push('/deck');
 
 	return (
 		<Container component='main' maxWidth='sm'>
@@ -47,10 +55,9 @@ export default function SignIn() {
 						margin='normal'
 						required
 						fullWidth
-						id='email'
-						label='Email Address'
-						name='email'
-						autoComplete='email'
+						id='username'
+						label='Username'
+						name='username'
 						autoFocus
 					/>
 					<TextField
@@ -92,3 +99,19 @@ export default function SignIn() {
 SignIn.getLayout = function getLayout(page) {
 	return <Layout>{page}</Layout>;
 };
+
+const mapStateToProps = (state) => {
+	return {
+		user: state.user,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		login: (credentials) => {
+			dispatch(login(credentials));
+		},
+	};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignIn);

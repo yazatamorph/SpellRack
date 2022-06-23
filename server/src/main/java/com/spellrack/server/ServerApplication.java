@@ -8,7 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.spellrack.server.auth.Roles;
 import com.spellrack.server.model.Role;
 import com.spellrack.server.model.User;
 import com.spellrack.server.service.UserService;
@@ -21,6 +24,21 @@ public class ServerApplication {
 	}
 
 	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/api/**");
+				// .allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin",
+				// "Access-Control-Request-Method",
+				// "Access-Control-Request-Headers",
+				// "Authorization")
+
+			}
+		};
+	}
+
+	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
@@ -28,16 +46,16 @@ public class ServerApplication {
 	@Bean
 	CommandLineRunner run(UserService userService) {
 		return args -> {
-			userService.saveRole(new Role(null, "ROLE_USER"));
-			userService.saveRole(new Role(null, "ROLE_MANAGER"));
-			userService.saveRole(new Role(null, "ROLE_ADMIN"));
-			userService.saveRole(new Role(null, "ROLE_SUPER"));
+			userService.saveRole(new Role(null, Roles.USER.value()));
+			userService.saveRole(new Role(null, Roles.MANAGER.value()));
+			userService.saveRole(new Role(null, Roles.ADMIN.value()));
+			userService.saveRole(new Role(null, Roles.SUPER.value()));
 
 			userService
 					.saveUser(new User(null, "zareensuxx", "zareensuxx@gmail.com", "beepboopboop", new ArrayList<>()));
 
-			userService.addRole("zareensuxx", "ROLE_USER");
-			userService.addRole("zareensuxx", "ROLE_SUPER");
+			userService.addRole("zareensuxx", Roles.USER.value());
+			userService.addRole("zareensuxx", Roles.SUPER.value());
 		};
 	}
 

@@ -49,6 +49,31 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<User> getUser(HttpServletRequest request) throws IOException {
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        try {
+            String access_token = authorizationHeader.substring("Bearer ".length());
+            // the secret here should be secured elsewhere and loaded on startup
+            Algorithm algorithm = Algorithm.HMAC256("it's a secret shhhhh".getBytes());
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            DecodedJWT decodedJWT = verifier.verify(access_token);
+            String username = decodedJWT.getSubject();
+            User user = userService.getUser(username);
+            user.setPassword(null);
+            return ResponseEntity.ok().body(user);
+        } catch (Exception e) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+    }
+
+    @PostMapping("/user/register")
+    public ResponseEntity<User> registerUser(@RequestBody User user) {
+        URI uri = URI
+                .create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/register").toUriString());
+        return ResponseEntity.created(uri).body(userService.saveUser(user));
+    }
+
     @PostMapping("/user/save")
     public ResponseEntity<User> saveUser(@RequestBody User user) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());

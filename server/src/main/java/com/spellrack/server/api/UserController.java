@@ -31,6 +31,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spellrack.server.auth.Roles;
 import com.spellrack.server.model.Role;
 import com.spellrack.server.model.User;
 import com.spellrack.server.service.UserService;
@@ -69,9 +70,20 @@ public class UserController {
 
     @PostMapping("/user/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
-        URI uri = URI
-                .create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/register").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
+        try {
+            if (userService.getUser(user.getUsername()) != null || userService.getByEmail(user.getEmail()) != null) {
+                throw new Exception("User already exists");
+            }
+            URI uri = URI
+                    .create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/register")
+                            .toUriString());
+            User fresh = userService.saveUser(user);
+            String username = fresh.getUsername();
+            userService.addRole(username, Roles.USER.value());
+            return ResponseEntity.created(uri).body(userService.getUser(username));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
     }
 
     @PostMapping("/user/save")

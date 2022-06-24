@@ -63,6 +63,11 @@ public class UserImplementation implements UserService, UserDetailsService {
     }
 
     @Override
+    public User getByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
+
+    @Override
     public List<User> getUsers() {
         return userRepo.findAll();
     }

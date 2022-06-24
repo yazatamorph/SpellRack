@@ -28,12 +28,19 @@ export const register = (credentials) => async (dispatch) => {
 			`${API_URL}/api/user/register`,
 			credentials
 		);
-		await localStorage.setItem('SR_access_token', data.access_token);
-		await localStorage.setItem('SR_refresh_token', data.refresh_token);
-		dispatch(gotUser(data));
+		if (data.id) {
+			const { username, password } = credentials;
+			await dispatch(login({ username, password }));
+		}
 	} catch (error) {
 		console.error(error);
-		dispatch(gotUser({ error: 'Server Error' }));
+		if (error?.response?.status === 403) {
+			dispatch(
+				gotUser({ error: 'User with username or email already exists' })
+			);
+		} else {
+			dispatch(gotUser({ error: 'Server Error' }));
+		}
 	}
 };
 
@@ -42,7 +49,9 @@ export const login = (credentials) => async (dispatch) => {
 		const { data } = await axios.post(`${API_URL}/api/user/login`, credentials);
 		await localStorage.setItem('SR_access_token', data.access_token);
 		await localStorage.setItem('SR_refresh_token', data.refresh_token);
+
 		dispatch(gotUser(data));
+		dispatch(fetchUser());
 	} catch (error) {
 		console.error(error);
 		dispatch(gotUser({ error: 'Server Error' }));

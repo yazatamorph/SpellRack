@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
 import {
 	Avatar,
 	Box,
@@ -18,15 +17,14 @@ import Layout from '../layouts/AuthLayout';
 import Link from '../components/Link';
 import { register } from '../store/utils/thunkCreators';
 function SignUp(props) {
-	const { user, register } = props;
-	const router = useRouter();
+	const { register } = props;
 	const [formErrorMessage, setFormErrorMessage] = useState({});
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
 
-		if (password !== confirmPassword) {
+		if (data.get('password') !== data.get('confirmPassword')) {
 			setFormErrorMessage({ confirmPassword: 'Passwords must match' });
 			return;
 		}
@@ -37,8 +35,6 @@ function SignUp(props) {
 			password: data.get('password'),
 		});
 	};
-
-	if (user.id) router.push('/deck');
 
 	return (
 		<Grid container component='main' sx={{ display: 'flex', flexGrow: 1 }}>

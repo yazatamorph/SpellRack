@@ -1,5 +1,4 @@
 import React from 'react';
-import { useRouter } from 'next/router';
 import {
 	Avatar,
 	Box,
@@ -18,8 +17,7 @@ import Link from '../components/Link';
 import { login } from '../store/utils/thunkCreators';
 
 function SignIn(props) {
-	const { user, login } = props;
-	const router = useRouter();
+	const { login } = props;
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
@@ -29,8 +27,6 @@ function SignIn(props) {
 			password: data.get('password'),
 		});
 	};
-
-	if (user.id) router.push('/deck');
 
 	return (
 		<Container component='main' maxWidth='sm'>

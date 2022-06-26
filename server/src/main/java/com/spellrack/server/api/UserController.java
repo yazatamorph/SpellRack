@@ -61,7 +61,6 @@ public class UserController {
             DecodedJWT decodedJWT = verifier.verify(access_token);
             String username = decodedJWT.getSubject();
             User user = userService.getUser(username);
-            user.setPassword(null);
             return ResponseEntity.ok().body(user);
         } catch (Exception e) {
             return ResponseEntity.unprocessableEntity().body(null);

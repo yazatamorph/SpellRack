@@ -29,6 +29,8 @@ public interface UserService {
 
     void removeDeck(String username, String deckTitle);
 
+    List<Deck> getAllDecks();
+
     // Card-specific methods
     Card saveCard(Card card);
 

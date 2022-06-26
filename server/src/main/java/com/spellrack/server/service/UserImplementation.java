@@ -105,6 +105,11 @@ public class UserImplementation implements UserService, UserDetailsService {
         user.getDecks().remove(deckTitle);
     };
 
+    @Override
+    public List<Deck> getAllDecks() {
+        return deckRepo.findAll();
+    }
+
     // Card-specific method overrides
     @Override
     public Card saveCard(Card card) {

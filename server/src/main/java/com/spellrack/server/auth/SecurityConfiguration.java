@@ -39,12 +39,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         authFilter.setFilterProcessesUrl("/api/user/login");
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // Unrestricted routes
         http.authorizeRequests()
                 .antMatchers("/api/user/login/**", "/api/user/register/**", "/api/user/refresh/**")
                 .permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/user/**").hasAnyAuthority(Roles.USER.value());
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/save/**", "/api/users/**")
+        // Requires USER role
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/user/**", "/api/decks/**")
+                .hasAnyAuthority(Roles.USER.value());
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/deck/**").hasAnyAuthority(Roles.USER.value());
+        http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/user/deck/card/**")
+                .hasAnyAuthority(Roles.USER.value());
+        http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/user/deck/**")
+                .hasAnyAuthority(Roles.USER.value());
+        // Requires ADMIN role
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**")
                 .hasAnyAuthority(Roles.ADMIN.value());
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/api/user/save/**", "/api/user/addrole/**", "/api/role/save/**")
+                .hasAnyAuthority(Roles.ADMIN.value());
+
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(authFilter);
         http.addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -1,27 +1,31 @@
 package com.spellrack.server.model;
 
-import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import org.springframework.data.rest.core.annotation.RestResource;
-
 @AllArgsConstructor
-@Builder
 @Data
 @Entity
 @NoArgsConstructor
-@RestResource
-@Table(name = "DECK")
 public class Deck {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
     private Long id;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "USER_ID", nullable = false, updatable = false)
-    private User user;
+    private String title;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKey(name = "cardScryfallId")
+    private Map<String, CardQuantity> cards = new HashMap<>(); // key is scryfall_id from theCard entity
 }

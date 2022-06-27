@@ -32,7 +32,7 @@ export default function SearchDialogue() {
 
 	return (
 		<React.Fragment>
-			<Button variant='outlined' onClick={handleClickOpen}>
+			<Button variant='outlined' color='inherit' onClick={handleClickOpen}>
 				Find Cards
 			</Button>
 			<Dialog

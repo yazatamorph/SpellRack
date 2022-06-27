@@ -42,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+
 public class UserController {
     private final UserService userService;
 
@@ -71,6 +72,7 @@ public class UserController {
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         try {
             if (userService.getUser(user.getUsername()) != null || userService.getByEmail(user.getEmail()) != null) {
+
                 throw new Exception("User already exists");
             }
             URI uri = URI
@@ -79,7 +81,9 @@ public class UserController {
             User fresh = userService.saveUser(user);
             String username = fresh.getUsername();
             userService.addRole(username, Roles.USER.value());
-            return ResponseEntity.created(uri).body(userService.getUser(username));
+            User sanitizing = userService.getUser(username);
+            return ResponseEntity.created(uri).body(new User(sanitizing.getId(), sanitizing.getUsername(),
+                    sanitizing.getEmail(), null, sanitizing.getRoles(), sanitizing.getDecks()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }

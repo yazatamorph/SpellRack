@@ -33,17 +33,17 @@ public class DeckController {
         return ResponseEntity.ok().body(userService.getAllDecks());
     }
 
-    @GetMapping("/user/decks")
-    public ResponseEntity<Map<String, Deck>> getUserDecks(@RequestBody String username) {
-        return ResponseEntity.ok().body(userService.getUser(username).getDecks());
+    @PostMapping("/user/decks")
+    public ResponseEntity<Map<String, Deck>> getUserDecks(@RequestBody AllUserDecksBody body) {
+        return ResponseEntity.ok().body(userService.getUser(body.getUsername()).getDecks());
     }
 
-    @GetMapping("/user/deck")
+    @PostMapping("/user/deck")
     public ResponseEntity<Deck> getOneDeck(@RequestBody OneDeckBody body) {
         return ResponseEntity.ok().body(userService.getUser(body.getUsername()).getDecks().get(body.getDeckTitle()));
     }
 
-    @PostMapping("/user/deck")
+    @PostMapping("/user/deck/new")
     public ResponseEntity<Object> createDeck(@RequestBody Deck deck) {
         try {
             String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -53,6 +53,7 @@ public class DeckController {
             } else if (user.getDecks().get(deck.getTitle()) != null) {
                 throw new Exception("User already owns a deck with this title");
             }
+            // Deck savedDeck = userService.saveDeck(deck);
             return ResponseEntity.ok().body(userService.assignDeck(username, userService.saveDeck(deck)));
         } catch (Exception e) {
             return ResponseEntity.unprocessableEntity().body(new ErrorBody(e.getMessage()));
@@ -94,6 +95,11 @@ public class DeckController {
 class OneDeckBody {
     private String username;
     private String deckTitle;
+}
+
+@Data
+class AllUserDecksBody {
+    String username;
 }
 
 @Data

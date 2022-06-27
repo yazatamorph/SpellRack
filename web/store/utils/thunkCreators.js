@@ -1,5 +1,7 @@
 import axios from 'axios';
+import { clearOnLogout } from '..';
 import { gotUser, setFetchingStatus } from '../user';
+import { gotAllDecks, gotOneDeck, removeDeck, updatedDeckCard } from '../deck';
 
 axios.interceptors.request.use(async function (config) {
 	const token = await localStorage.getItem('SR_access_token');
@@ -8,12 +10,12 @@ axios.interceptors.request.use(async function (config) {
 	return config;
 });
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://localhost:8080/api';
 // User thunks
 export const fetchUser = () => async (dispatch) => {
 	dispatch(setFetchingStatus(true));
 	try {
-		const { data } = await axios.get(`${API_URL}/api/user`);
+		const { data } = await axios.get(`${API_URL}/user`);
 		dispatch(gotUser(data));
 	} catch (error) {
 		console.error(error);
@@ -24,10 +26,9 @@ export const fetchUser = () => async (dispatch) => {
 
 export const register = (credentials) => async (dispatch) => {
 	try {
-		const { data } = await axios.post(
-			`${API_URL}/api/user/register`,
-			credentials
-		);
+		console.log(credentials);
+		const { data } = await axios.post(`${API_URL}/user/register`, credentials);
+		console.log(data);
 		if (data.id) {
 			const { username, password } = credentials;
 			await dispatch(login({ username, password }));
@@ -46,7 +47,7 @@ export const register = (credentials) => async (dispatch) => {
 
 export const login = (credentials) => async (dispatch) => {
 	try {
-		const { data } = await axios.post(`${API_URL}/api/user/login`, credentials);
+		const { data } = await axios.post(`${API_URL}/user/login`, credentials);
 		await localStorage.setItem('SR_access_token', data.access_token);
 		await localStorage.setItem('SR_refresh_token', data.refresh_token);
 
@@ -60,10 +61,81 @@ export const login = (credentials) => async (dispatch) => {
 
 export const logout = () => async (dispatch) => {
 	try {
-		await axios.delete(`${API_URL}/api/user/logout`);
+		await axios.get(`${API_URL}/user/logout`);
 		await localStorage.removeItem('SR_access_token');
 		await localStorage.removeItem('SR_refresh_token');
-		dispatch(gotUser({}));
+		dispatch(clearOnLogout());
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const fetchUserDecks = (username) => async (dispatch) => {
+	try {
+		const { data } = await axios.post(`${API_URL}/user/decks`, {
+			username,
+		});
+		dispatch(gotAllDecks(data));
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const fetchOneDeck =
+	({ username, deckTitle }) =>
+	async (dispatch) => {
+		try {
+			const { data } = await axios.post(`${API_URL}/user/deck`, {
+				username,
+				deckTitle,
+			});
+			dispatch(gotOneDeck(data));
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+export const fetchAllDecks = () => async (dispatch) => {
+	try {
+		const { data } = await axios.get(`${API_URL}/decks`);
+		dispatch(gotAllDecks(data));
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const createDeck = (title) => async (dispatch) => {
+	try {
+		const { data } = await axios.post(`${API_URL}/user/deck/new`, {
+			id: null,
+			title,
+		});
+		dispatch(gotOneDeck(data));
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const deleteDeck =
+	({ id, title }) =>
+	async (dispatch) => {
+		try {
+			await axios.delete(`${API_URL}/user/deck`, {
+				data: {
+					id,
+					title,
+				},
+			});
+			dispatch(removeDeck(id));
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+export const updateDeckCard = (update) => async (dispatch) => {
+	try {
+		await axios.put(`${API_URL}/user/deck/card`, update);
+		dispatch(updatedDeckCard(update));
 	} catch (error) {
 		console.error(error);
 	}

@@ -9,35 +9,87 @@ import {
 	InputBase,
 	Typography,
 } from '@mui/material';
-import { Add, Remove, SettingsOutlined } from '@mui/icons-material';
+import { Add, Remove, DeleteOutlined } from '@mui/icons-material';
+import { connect } from 'react-redux';
 
-const NumController = ({ quantity = 0 }) => {
+import { updateDeckCard } from '../store/utils/thunkCreators';
+
+const NumController = ({ quantity = 0, onQuantityChange }) => {
+	const handleButtonChanges = (operation, qty) => {
+		let newQuantity = qty;
+		if (operation === 'dec') {
+			newQuantity--;
+		}
+		if (operation === 'inc') {
+			newQuantity++;
+		}
+		onQuantityChange(newQuantity);
+	};
+	const handleInputChange = (event) => {
+		event.preventDefault();
+		onQuantityChange(Number(event.target.value));
+	};
 	return (
 		<Box sx={{ display: 'flex' }} justifyContent='flex-end'>
-			<IconButton size='small'>
+			<IconButton
+				size='small'
+				onClick={() => handleButtonChanges('dec', quantity)}
+			>
 				<Remove fontSize='inherit' />
 			</IconButton>
-			<InputBase value={quantity} sx={{ maxWidth: 0.2 }} />
-			<IconButton size='small'>
+			<InputBase
+				value={quantity}
+				sx={{ maxWidth: 0.2 }}
+				onChange={handleInputChange}
+			/>
+			<IconButton
+				size='small'
+				onClick={() => handleButtonChanges('inc', quantity)}
+			>
 				<Add fontSize='inherit' />
 			</IconButton>
 		</Box>
 	);
 };
 
-const Item = ({ cardInfo }) => {
+const Item = ({ cardInfo, onCardChanges }) => {
+	const [scryfallId, card] = cardInfo;
+
+	const handleQuantityChange = (quantity) => {
+		onCardChanges({
+			card: {
+				...card,
+				quantity,
+				scryfallId,
+			},
+			quantity,
+		});
+	};
+	const handleDelete = () => {
+		onCardChanges({
+			card: {
+				...card,
+				quantity: 0,
+				scryfallId,
+			},
+			quantity: 0,
+		});
+	};
 	return (
 		<Grid item xs={4} sm={4} md={3}>
 			<Card square variant='outlined' sx={{ display: 'flex' }}>
 				<CardActionArea sx={{ px: 2 }}>
 					<Typography noWrap variant='body2'>
-						I&apos;m gonna be a deck list.
+						{card.name} a card here
 					</Typography>
 				</CardActionArea>
 				<CardActions>
-					<NumController />
-					<IconButton size='small' aria-label='settings'>
-						<SettingsOutlined fontSize='inherit' />
+					<NumController
+						quantity={card.quantity}
+						onQuantityChange={handleQuantityChange}
+					/>
+					<IconButton size='small' aria-label='settings' onClick={handleDelete}>
+						<DeleteOutlined fontSize='inherit' />
 					</IconButton>
 				</CardActions>
 			</Card>
@@ -45,8 +97,20 @@ const Item = ({ cardInfo }) => {
 	);
 };
 
-export default function DeckList() {
-	const deckCards = Array.from(Array(100));
+function DeckList(props) {
+	const { deck = {}, updateDeckCard, cards = new Map() } = props;
+	const cardList = [...cards.entries()] || [];
+
+	const handleCardChanges = async (change) => {
+		const update = {
+			deckId: deck.id,
+			deckTitle: deck.title,
+			card: change.card,
+			quantity: change.quantity,
+		};
+
+		await updateDeckCard(update);
+	};
 
 	return (
 		<React.Fragment>
@@ -59,10 +123,33 @@ export default function DeckList() {
 				columnSpacing={0.5}
 				columns={{ xs: 4, sm: 8, md: 9 }}
 			>
-				{deckCards.map((_, i) => (
-					<Item key={i} />
-				))}
+				{cardList.map((card) => {
+					return (
+						<Item
+							key={card[0]}
+							cardInfo={card}
+							onCardChanges={handleCardChanges}
+						/>
+					);
+				})}
 			</Grid>
 		</React.Fragment>
 	);
 }
+
+const mapStateToProps = (state) => {
+	return {
+		deck: state.deck.current,
+		cards: state.deck.current.cards,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		updateDeckCard: (update) => {
+			dispatch(updateDeckCard(update));
+		},
+	};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(DeckList);

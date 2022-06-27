@@ -25,61 +25,70 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private final UserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+        private final UserDetailsService userDetailsService;
+        private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
-    }
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+                auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+        }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        AuthenticationFilter authFilter = new AuthenticationFilter(authenticationManagerBean());
-        authFilter.setFilterProcessesUrl("/api/user/login");
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        // Unrestricted routes
-        http.authorizeRequests()
-                .antMatchers("/api/user/login/**", "/api/user/register/**", "/api/user/refresh/**")
-                .permitAll();
-        // Requires USER role
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/user/**", "/api/decks/**")
-                .hasAnyAuthority(Roles.USER.value());
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/deck/**").hasAnyAuthority(Roles.USER.value());
-        http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/user/deck/card/**")
-                .hasAnyAuthority(Roles.USER.value());
-        http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/user/deck/**")
-                .hasAnyAuthority(Roles.USER.value());
-        // Requires ADMIN role
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**")
-                .hasAnyAuthority(Roles.ADMIN.value());
-        http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/user/save/**", "/api/user/addrole/**", "/api/role/save/**")
-                .hasAnyAuthority(Roles.ADMIN.value());
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+                AuthenticationFilter authFilter = new AuthenticationFilter(authenticationManagerBean());
+                authFilter.setFilterProcessesUrl("/api/user/login");
+                http.csrf().disable();
+                http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                // Unrestricted routes
+                http.authorizeRequests()
+                                .antMatchers("/api/user/logout/**", "/api/user/login/**", "/api/user/register/**",
+                                                "/api/user/refresh/**")
+                                .permitAll();
+                // Requires USER role
+                http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/user/**", "/api/decks/**")
+                                .hasAnyAuthority(Roles.USER.value());
+                http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/deck/**")
+                                .hasAnyAuthority(Roles.USER.value());
+                http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/user/deck/card/**")
+                                .hasAnyAuthority(Roles.USER.value());
+                http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/user/deck/**")
+                                .hasAnyAuthority(Roles.USER.value());
+                // Requires ADMIN role
+                http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**")
+                                .hasAnyAuthority(Roles.ADMIN.value());
+                http.authorizeRequests()
+                                .antMatchers(HttpMethod.POST, "/api/user/save/**", "/api/user/addrole/**",
+                                                "/api/role/save/**")
+                                .hasAnyAuthority(Roles.ADMIN.value());
+                http.logout().logoutUrl("/api/user/logout").logoutSuccessUrl("http://localhost:3000/signin");
+                http.authorizeRequests().anyRequest().authenticated();
+                http.addFilter(authFilter);
+                http.addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+                http.cors();
+        }
 
-        http.authorizeRequests().anyRequest().authenticated();
-        http.addFilter(authFilter);
-        http.addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.cors();
-    }
+        @Bean
+        @Override
+        public AuthenticationManager authenticationManagerBean() throws Exception {
+                return super.authenticationManagerBean();
+        }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
-    @Bean
-    CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
+        @Bean
+        CorsFilter corsFilter() {
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowCredentials(true);
+                config.addAllowedOrigin("http://localhost:3000");
+                config.addAllowedHeader("*");
+                config.addAllowedMethod(HttpMethod.DELETE);
+                config.addAllowedMethod(HttpMethod.GET);
+                config.addAllowedMethod(HttpMethod.HEAD);
+                config.addAllowedMethod(HttpMethod.POST);
+                config.addAllowedMethod(HttpMethod.PUT);
+                config.addAllowedMethod(HttpMethod.OPTIONS);
+                config.addAllowedMethod("*");
+                source.registerCorsConfiguration("/**", config);
+                return new CorsFilter(source);
+        }
 
 }

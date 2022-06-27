@@ -64,7 +64,7 @@ public class ServerApplication {
 
 			userService.assignCard("zareensuxx", "My Test Deck", testCard, 2);
 			userService.assignCard("zareensuxx", "My Test Deck", bestCard, 4);
-			// userService.removeDeck("zareensuxx", "My Test Deck");
+
 		};
 	}
 

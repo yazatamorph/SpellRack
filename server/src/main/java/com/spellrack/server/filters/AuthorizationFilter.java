@@ -26,6 +26,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(
@@ -33,6 +36,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         if (request.getServletPath().equals("/api/user/login") || request.getServletPath().equals("/api/user/register")
                 || request.getServletPath().equals("/api/user/refresh")) {
+            log.info("SUCCESS: we are NOT checking for authorization on registration");
             filterChain.doFilter(request, response);
         } else {
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);

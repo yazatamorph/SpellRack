@@ -8,12 +8,16 @@ function ReduxWitchery(props) {
 	const router = useRouter();
 
 	useEffect(() => {
-		fetchUser();
-	}, [fetchUser]);
+		if (!user.id || !user.username) {
+			fetchUser();
+		}
+	}, [fetchUser, user.id, user.username]);
 
-	useEffect(() => {
-		console.log('BIG ERRORZ M80', user.error);
-	}, [user.error]);
+	// useEffect(() => {
+	// 	if (user.error) {
+	// 		console.log('BIG ERRORZ M80', user.error);
+	// 	}
+	// }, [user.error]);
 	// TODO: fix what this renders to be a loading dialogue or something
 	// if (user.isFetchingUser) {
 	// 	return <div>Loading...</div>;
@@ -22,7 +26,7 @@ function ReduxWitchery(props) {
 		const toRedirect = ['/signin', '/signup'];
 		if (user.id && toRedirect.includes(router.pathname)) {
 			console.log("I'M FIRIN MAH REDIRECT");
-			router.push('/deck');
+			router.push(`/${user.username}/decks`);
 		}
 	}, [user, router]);
 

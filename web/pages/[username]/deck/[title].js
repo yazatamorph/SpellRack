@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { connect } from 'react-redux';
@@ -14,6 +14,7 @@ function Deck(props) {
 	const router = useRouter();
 	const { username, title } = router.query;
 	const { deck, fetchOneDeck } = props;
+	const [featured, setFeatured] = useState(null);
 
 	useEffect(() => {
 		if (router.isReady) {
@@ -21,6 +22,10 @@ function Deck(props) {
 			(async () => await fetchOneDeck({ username, deckTitle }))();
 		}
 	}, [router, fetchOneDeck, username, title]);
+
+	const handleNewFeature = (card) => {
+		setFeatured(card);
+	};
 
 	return (
 		<React.Fragment>
@@ -42,15 +47,9 @@ function Deck(props) {
 					rowGap={0.5}
 					direction={{ xs: 'column', sm: 'row' }}
 				>
-					<FeatureCard
-						imageSource={[
-							'https://c1.scryfall.com/file/scryfall-cards/normal/front/b/0/b0fe4b53-18f6-42eb-b03f-cab3e5a7fba6.jpg?1637022472',
-							'https://c1.scryfall.com/file/scryfall-cards/normal/back/b/0/b0fe4b53-18f6-42eb-b03f-cab3e5a7fba6.jpg?1637022472',
-						]}
-						cardName='Clearwater Pathway / Murkwater Pathway'
-					/>
+					<FeatureCard card={featured} />
 
-					<DeckList />
+					<DeckList onNewFeature={handleNewFeature} />
 				</Stack>
 			</Grid>
 			<Box sx={{ my: 2 }}></Box>

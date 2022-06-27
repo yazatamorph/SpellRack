@@ -11,7 +11,8 @@ import {
 	Toolbar,
 	Typography,
 } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { CatchingPokemonSharp, Close } from '@mui/icons-material';
+import axios from 'axios';
 
 import SearchResults from './SearchResults';
 
@@ -21,6 +22,60 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 export default function SearchDialogue() {
 	const [open, setOpen] = useState(false);
+	const [results, setResults] = useState([]);
+	const [totalCards, setTotalCards] = useState(null);
+	const [displayed, setDisplayed] = useState([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
+
+	const handleSearch = async (event) => {
+		event.preventDefault();
+		const data = new FormData(event.currentTarget);
+		const terms = data.get('search');
+		try {
+			let { data } = await axios.get(
+				`https://api.scryfall.com/cards/search?order=set&q=${terms.replaceAll(
+					' ',
+					'+'
+				)}`
+			);
+			console.log('Things still happen', data);
+			const { total_cards = null } = data;
+			let {
+				has_more = false,
+				next_page = undefined,
+				data: currentResults = [],
+			} = data;
+			console.log('beep', currentResults);
+			while (has_more) {
+				const res = await axios.get(next_page);
+				data = res.data;
+				has_more = data.has_more;
+				if (data.has_more) {
+					next_page = data.next_page;
+				}
+				console.log('Yep, still working');
+				currentResults = [...currentResults, ...data.data];
+			}
+
+			setResults(currentResults);
+			setTotalCards(total_cards);
+			setTotalPages(Math.ceil(totalCards / 20));
+		} catch (err) {
+			console.error('Problem getting results from Scryfall', err);
+		}
+	};
+
+	const makePages = (pageNum) => {
+		const toDisplay = [];
+		const startIndex = pageNum * 20 - 20;
+		const endIndex = pageNum * 20 > totalCards ? totalCards : pageNum * 20;
+		for (let i = startIndex; i < endIndex; i++) {
+			toDisplay.push(results[i]);
+		}
+		setDisplayed(toDisplay);
+		setCurrentPage(pageNum);
+	};
 
 	const handleClickOpen = () => {
 		setOpen(true);
@@ -58,6 +113,8 @@ export default function SearchDialogue() {
 				</AppBar>
 				<Container maxWidth='lg'>
 					<Box
+						component='form'
+						onSubmit={handleSearch}
 						sx={{
 							my: 4,
 							display: 'flex',
@@ -73,8 +130,7 @@ export default function SearchDialogue() {
 							autoFocus
 							sx={{ mb: 2 }}
 						/>
-
-						<SearchResults />
+						<SearchResults cards={results} />
 					</Box>
 				</Container>
 			</Dialog>

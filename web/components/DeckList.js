@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
 	Box,
 	Card,
@@ -52,7 +52,7 @@ const NumController = ({ quantity = 0, onQuantityChange }) => {
 	);
 };
 
-const Item = ({ cardInfo, onCardChanges }) => {
+const Item = ({ cardInfo, onCardChanges, onNewFeature }) => {
 	const [scryfallId, card] = cardInfo;
 
 	const handleQuantityChange = (quantity) => {
@@ -78,9 +78,9 @@ const Item = ({ cardInfo, onCardChanges }) => {
 	return (
 		<Grid item xs={4} sm={4} md={3}>
 			<Card square variant='outlined' sx={{ display: 'flex' }}>
-				<CardActionArea sx={{ px: 2 }}>
+				<CardActionArea sx={{ px: 2 }} onClick={() => onNewFeature(card)}>
 					<Typography noWrap variant='body2'>
-						{card.name} a card here
+						{card.name}
 					</Typography>
 				</CardActionArea>
 				<CardActions>
@@ -98,7 +98,7 @@ const Item = ({ cardInfo, onCardChanges }) => {
 };
 
 function DeckList(props) {
-	const { deck = {}, updateDeckCard, cards = new Map() } = props;
+	const { deck = {}, updateDeckCard, cards = new Map(), onNewFeature } = props;
 	const cardList = [...cards.entries()] || [];
 
 	const handleCardChanges = async (change) => {
@@ -111,6 +111,13 @@ function DeckList(props) {
 
 		await updateDeckCard(update);
 	};
+
+	useEffect(() => {
+		if (cardList.length) {
+			const card = cardList[0][1];
+			onNewFeature(card);
+		}
+	}, []);
 
 	return (
 		<React.Fragment>
@@ -129,6 +136,7 @@ function DeckList(props) {
 							key={card[0]}
 							cardInfo={card}
 							onCardChanges={handleCardChanges}
+							onNewFeature={onNewFeature}
 						/>
 					);
 				})}

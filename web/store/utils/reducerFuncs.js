@@ -1,5 +1,11 @@
 export const loadedAllDecks = (state, decks) => {
-	const all = new Map(Object.entries(decks));
+	const all = new Map();
+
+	Object.entries(decks).forEach((deck) => {
+		const [_, details] = deck;
+		all.set(details.id, details);
+	});
+
 	const newState = { ...state, all };
 	return newState;
 };

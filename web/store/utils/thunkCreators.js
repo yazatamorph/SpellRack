@@ -26,9 +26,7 @@ export const fetchUser = () => async (dispatch) => {
 
 export const register = (credentials) => async (dispatch) => {
 	try {
-		console.log(credentials);
 		const { data } = await axios.post(`${API_URL}/user/register`, credentials);
-		console.log(data);
 		if (data.id) {
 			const { username, password } = credentials;
 			await dispatch(login({ username, password }));

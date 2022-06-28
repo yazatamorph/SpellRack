@@ -120,12 +120,13 @@ public class UserImplementation implements UserService, UserDetailsService {
     public void assignCard(String username, String deckTitle, Card card, Integer quantity)
             throws NoSuchElementException {
         Deck deck = userRepo.findByUsername(username).getDecks().get(deckTitle);
-        Card c = (cardRepo.findByScryfallId(card.getScryfallId()) != null) ? card : saveCard(card);
+        Card exists = cardRepo.findByScryfallId(card.getScryfallId());
+        Card c = (exists != null) ? exists : saveCard(card);
         if (quantity > 0) {
             if (deck.getCards().containsKey(c.getScryfallId())) {
                 deck.getCards().get(c.getScryfallId()).setQuantity(quantity);
             } else {
-                CardQuantity cq = quantityRepo.save(new CardQuantity(null, quantity, null,
+                CardQuantity cq = quantityRepo.save(new CardQuantity(null, quantity, c.getScryfallId(),
                         c));
                 deck.getCards().put(c.getScryfallId(), cq);
             }
